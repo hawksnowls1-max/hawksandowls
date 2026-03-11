@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hawks & Owls — Indie Game Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════
+   RESET & VARIABLES
+═══════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:       #0a0a0f;
+  --bg2:      #0f0f1a;
+  --card:     #13131f;
+  --border:   #2a2a3f;
+  --gold:     #f5c542;
+  --amber:    #e08c1a;
+  --teal:     #00e5c8;
+  --red:      #ff4455;
+  --purple:   #9b59ff;
+  --white:    #eeeef5;
+  --muted:    #6b6b8a;
+  --pixel:    'Press Start 2P', monospace;
+  --vt:       'VT323', monospace;
+  --body:     'Nunito', sans-serif;
+}
+
+/* ═══════════════════════════════════════
+   SCROLLBAR & CURSOR
+═══════════════════════════════════════ */
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:0;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:var(--body);
+  background:var(--bg);
+  color:var(--white);
+  overflow-x:hidden;
+  image-rendering:pixelated;
+}
+
+/* ═══════════════════════════════════════
+   PIXEL GRID BACKGROUND
+═══════════════════════════════════════ */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(245,197,66,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,197,66,0.03) 1px, transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;z-index:0;
+}
+
+/* scanline overlay */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events:none;z-index:1;
+}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:100;
+  background:rgba(10,10,15,0.95);
+  border-bottom:2px solid var(--gold);
+  padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+  backdrop-filter:blur(8px);
+}
+
+.nav-logo{
+  font-family:var(--pixel);
+  font-size:0.65rem;
+  color:var(--gold);
+  letter-spacing:1px;
+  line-height:1.6;
+  text-decoration:none;
+  cursor:pointer;
+}
+.nav-logo span{color:var(--teal);}
+
+.nav-links{
+  display:flex;gap:0;
+  list-style:none;
+}
+.nav-links li a{
+  font-family:var(--pixel);
+  font-size:0.5rem;
+  color:var(--muted);
+  text-decoration:none;
+  padding:0.6rem 0.9rem;
+  display:block;
+  border:1px solid transparent;
+  transition:color 0.15s, border-color 0.15s, background 0.15s;
+  letter-spacing:1px;
+}
+.nav-links li a:hover,
+.nav-links li a.active{
+  color:var(--gold);
+  border-color:var(--gold);
+  background:rgba(245,197,66,0.06);
+}
+
+.nav-search{
+  display:flex;align-items:center;gap:0;
+}
+.nav-search input{
+  font-family:var(--pixel);font-size:0.45rem;
+  background:var(--card);
+  border:2px solid var(--border);
+  color:var(--white);
+  padding:0.5rem 0.8rem;
+  outline:none;
+  width:180px;
+  transition:border-color 0.2s;
+}
+.nav-search input:focus{border-color:var(--teal);}
+.nav-search input::placeholder{color:var(--muted);}
+.nav-search button{
+  font-family:var(--pixel);font-size:0.45rem;
+  background:var(--gold);color:var(--bg);
+  border:2px solid var(--gold);
+  padding:0.5rem 0.7rem;
+  cursor:pointer;
+  font-weight:700;
+  transition:background 0.15s;
+}
+.nav-search button:hover{background:var(--amber);}
+
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{width:22px;height:2px;background:var(--gold);display:block;transition:0.3s;}
+
+/* ═══════════════════════════════════════
+   PAGE SYSTEM
+═══════════════════════════════════════ */
+.page{display:none;padding-top:64px;min-height:100vh;position:relative;z-index:2;}
+.page.active{display:block;}
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero{
+  min-height:calc(100vh - 64px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:4rem 2rem 2rem;
+  position:relative;
+  overflow:hidden;
+}
+
+/* animated pixel stars */
+.stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.star{
+  position:absolute;
+  width:4px;height:4px;
+  background:var(--gold);
+  animation:twinkle 2s step-end infinite;
+}
+@keyframes twinkle{
+  0%,100%{opacity:1;}50%{opacity:0.1;}
+}
+
+.hero-eyebrow{
+  font-family:var(--pixel);font-size:0.55rem;
+  color:var(--teal);letter-spacing:3px;
+  margin-bottom:1.5rem;
+  animation:fadeIn 0.5s ease both;
+}
+
+.hero-logo-text{
+  font-family:var(--pixel);
+  font-size:clamp(1.4rem,5vw,2.8rem);
+  line-height:1.5;
+  color:var(--gold);
+  text-shadow:
+    4px 4px 0 var(--amber),
+    -2px -2px 0 rgba(245,197,66,0.2);
+  margin-bottom:0.5rem;
+  animation:fadeIn 0.5s ease 0.1s both;
+}
+.hero-logo-text span{color:var(--teal);}
+
+.hero-tagline{
+  font-family:var(--vt);
+  font-size:clamp(1.4rem,3vw,2rem);
+  color:var(--muted);
+  margin-bottom:3rem;
+  animation:fadeIn 0.5s ease 0.2s both;
+}
+
+/* pixel owl sprite */
+.pixel-mascot{
+  font-size:5rem;
+  margin-bottom:2rem;
+  display:block;
+  animation:bounce 1s step-end infinite;
+  filter:drop-shadow(0 0 20px rgba(245,197,66,0.4));
+}
+@keyframes bounce{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+}
+
+.hero-btns{
+  display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;
+  animation:fadeIn 0.5s ease 0.3s both;
+}
+.btn{
+  font-family:var(--pixel);font-size:0.5rem;
+  padding:1rem 1.5rem;
+  border:2px solid;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+  transition:transform 0.1s, box-shadow 0.1s;
+  letter-spacing:1px;
+  image-rendering:pixelated;
+}
+.btn:active{transform:translate(2px,2px);}
+.btn-gold{
+  background:var(--gold);color:var(--bg);
+  border-color:var(--amber);
+  box-shadow:4px 4px 0 var(--amber);
+}
+.btn-gold:hover{box-shadow:2px 2px 0 var(--amber);transform:translate(2px,2px);}
+.btn-outline{
+  background:transparent;color:var(--teal);
+  border-color:var(--teal);
+  box-shadow:4px 4px 0 rgba(0,229,200,0.3);
+}
+.btn-outline:hover{box-shadow:2px 2px 0 rgba(0,229,200,0.3);transform:translate(2px,2px);}
+
+/* ═══════════════════════════════════════
+   SECTION COMMON
+═══════════════════════════════════════ */
+section{padding:5rem 2rem;position:relative;z-index:2;}
+.section-header{text-align:center;margin-bottom:3rem;}
+.section-tag{
+  font-family:var(--pixel);font-size:0.5rem;
+  color:var(--teal);letter-spacing:3px;
+  display:block;margin-bottom:0.8rem;
+}
+.section-title{
+  font-family:var(--pixel);
+  font-size:clamp(0.9rem,3vw,1.4rem);
+  color:var(--gold);
+  line-height:1.6;
+}
+.section-title span{color:var(--white);}
+
+.divider{
+  border:none;
+  border-top:2px solid var(--border);
+  margin:0;
+}
+
+/* ═══════════════════════════════════════
+   NEWS / LATEST — HOME
+═══════════════════════════════════════ */
+.news-section{background:var(--bg2);}
+.news-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:1.5rem;
+  max-width:1100px;margin:0 auto;
+}
+.news-card{
+  background:var(--card);
+  border:2px solid var(--border);
+  padding:1.5rem;
+  transition:border-color 0.2s, transform 0.15s, box-shadow 0.15s;
+  position:relative;
+  cursor:pointer;
+}
+.news-card::before{
+  content:'';position:absolute;
+  top:-2px;left:-2px;right:-2px;bottom:-2px;
+  border:2px solid transparent;
+  transition:border-color 0.2s;
+  pointer-events:none;
+}
+.news-card:hover{
+  border-color:var(--gold);
+  transform:translate(-3px,-3px);
+  box-shadow:6px 6px 0 var(--gold);
+}
+.news-card:hover::before{border-color:var(--gold);}
+.news-type{
+  font-family:var(--pixel);font-size:0.4rem;
+  padding:0.3rem 0.6rem;
+  display:inline-block;margin-bottom:0.8rem;
+  letter-spacing:1px;
+}
+.type-yt{background:var(--red);color:#fff;}
+.type-dev{background:var(--purple);color:#fff;}
+.type-update{background:var(--teal);color:var(--bg);}
+.news-thumb{
+  width:100%;aspect-ratio:16/9;
+  background:linear-gradient(135deg,#1a1a2e,#2a1a40);
+  margin-bottom:1rem;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;
+  border:1px solid var(--border);
+}
+.news-card h3{
+  font-family:var(--pixel);font-size:0.55rem;
+  color:var(--white);line-height:1.8;
+  margin-bottom:0.6rem;
+}
+.news-card p{
+  font-family:var(--vt);font-size:1.1rem;
+  color:var(--muted);line-height:1.5;
+}
+.news-date{
+  font-family:var(--pixel);font-size:0.38rem;
+  color:var(--muted);margin-top:0.8rem;
+  display:block;
+}
+
+/* ═══════════════════════════════════════
+   SOCIALS BAR
+═══════════════════════════════════════ */
+.socials-bar{
+  background:var(--bg);
+  padding:3rem 2rem;
+  text-align:center;
+}
+.socials-row{
+  display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;
+  max-width:700px;margin:1.5rem auto 0;
+}
+.social-btn{
+  font-family:var(--pixel);font-size:0.45rem;
+  padding:0.8rem 1.2rem;
+  border:2px solid;
+  text-decoration:none;
+  transition:transform 0.1s,box-shadow 0.1s;
+  display:flex;align-items:center;gap:0.5rem;
+  letter-spacing:1px;
+}
+.social-btn:active{transform:translate(2px,2px);}
+.s-yt  {color:#ff4444;border-color:#ff4444;box-shadow:3px 3px 0 #aa2222;}
+.s-yt:hover  {transform:translate(3px,3px);box-shadow:none;}
+.s-med {color:#e0e0e0;border-color:#e0e0e0;box-shadow:3px 3px 0 #888;}
+.s-med:hover {transform:translate(3px,3px);box-shadow:none;}
+.s-red {color:#ff6314;border-color:#ff6314;box-shadow:3px 3px 0 #c04000;}
+.s-red:hover {transform:translate(3px,3px);box-shadow:none;}
+
+/* ═══════════════════════════════════════
+   GAMES PAGE
+═══════════════════════════════════════ */
+.games-hero{
+  background:linear-gradient(180deg,var(--bg2),var(--bg));
+  padding:5rem 2rem 3rem;text-align:center;
+}
+.search-bar-big{
+  display:flex;gap:0;justify-content:center;max-width:500px;margin:2rem auto 0;
+}
+.search-bar-big input{
+  flex:1;font-family:var(--pixel);font-size:0.5rem;
+  background:var(--card);border:2px solid var(--gold);
+  border-right:none;color:var(--white);
+  padding:0.8rem 1rem;outline:none;
+}
+.search-bar-big input::placeholder{color:var(--muted);}
+.search-bar-big button{
+  font-family:var(--pixel);font-size:0.5rem;
+  background:var(--gold);color:var(--bg);
+  border:2px solid var(--gold);
+  padding:0.8rem 1rem;cursor:pointer;
+  white-space:nowrap;
+}
+.search-bar-big button:hover{background:var(--amber);}
+
+.filter-tabs{
+  display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;
+  margin:1.5rem 0 3rem;
+}
+.filter-tab{
+  font-family:var(--pixel);font-size:0.4rem;
+  padding:0.5rem 0.9rem;border:2px solid var(--border);
+  background:transparent;color:var(--muted);
+  cursor:pointer;transition:all 0.15s;letter-spacing:1px;
+}
+.filter-tab.active,.filter-tab:hover{
+  border-color:var(--gold);color:var(--gold);
+  background:rgba(245,197,66,0.07);
+}
+
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:2rem;max-width:900px;margin:0 auto;
+  padding:0 2rem 5rem;
+}
+.game-card{
+  background:var(--card);
+  border:2px solid var(--border);
+  transition:transform 0.15s,box-shadow 0.15s,border-color 0.2s;
+  position:relative;overflow:hidden;
+}
+.game-card:hover{
+  transform:translate(-4px,-4px);
+  box-shadow:8px 8px 0 var(--gold);
+  border-color:var(--gold);
+}
+.game-cover{
+  width:100%;aspect-ratio:16/9;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  position:relative;overflow:hidden;
+}
+.game-cover-pc{background:linear-gradient(135deg,#1a0a2e,#2a1060);}
+.game-cover-tt{background:linear-gradient(135deg,#1a0a00,#3a1a00);}
+.game-cover-label{
+  position:absolute;top:0.6rem;right:0.6rem;
+  font-family:var(--pixel);font-size:0.38rem;
+  padding:0.3rem 0.5rem;letter-spacing:1px;
+}
+.label-beta{background:var(--red);color:#fff;}
+.label-live{background:var(--teal);color:var(--bg);}
+.game-info{padding:1.5rem;}
+.game-info h2{
+  font-family:var(--pixel);font-size:0.7rem;
+  color:var(--gold);line-height:1.8;margin-bottom:0.5rem;
+}
+.game-genre{
+  font-family:var(--pixel);font-size:0.38rem;
+  color:var(--teal);letter-spacing:2px;margin-bottom:0.8rem;
+  display:block;
+}
+.game-info p{
+  font-family:var(--vt);font-size:1.15rem;
+  color:var(--muted);line-height:1.5;margin-bottom:1.2rem;
+}
+.game-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.2rem;}
+.tag{
+  font-family:var(--pixel);font-size:0.35rem;
+  padding:0.25rem 0.5rem;
+  border:1px solid var(--border);
+  color:var(--muted);letter-spacing:1px;
+}
+.game-btns{display:flex;gap:0.6rem;flex-wrap:wrap;}
+.btn-sm{
+  font-family:var(--pixel);font-size:0.4rem;
+  padding:0.6rem 1rem;border:2px solid;
+  cursor:pointer;text-decoration:none;
+  display:inline-block;
+  transition:transform 0.1s,box-shadow 0.1s;
+  letter-spacing:1px;
+}
+.btn-sm:active{transform:translate(2px,2px);}
+.btn-sm-gold{
+  background:var(--gold);color:var(--bg);
+  border-color:var(--amber);
+  box-shadow:3px 3px 0 var(--amber);
+}
+.btn-sm-gold:hover{transform:translate(3px,3px);box-shadow:none;}
+.btn-sm-outline{
+  background:transparent;color:var(--teal);
+  border-color:var(--teal);
+  box-shadow:3px 3px 0 rgba(0,229,200,0.3);
+}
+.btn-sm-outline:hover{transform:translate(3px,3px);box-shadow:none;}
+
+.no-results{
+  text-align:center;padding:3rem;
+  grid-column:1/-1;
+  font-family:var(--pixel);font-size:0.6rem;
+  color:var(--muted);line-height:2;
+}
+
+/* ═══════════════════════════════════════
+   ABOUT PAGE
+═══════════════════════════════════════ */
+.about-hero{
+  background:linear-gradient(180deg,var(--bg2),var(--bg));
+  padding:5rem 2rem 4rem;text-align:center;
+}
+.about-content{
+  max-width:800px;margin:0 auto;padding:0 2rem 5rem;
+}
+.pixel-card{
+  background:var(--card);
+  border:2px solid var(--border);
+  padding:2rem;margin-bottom:2rem;
+  position:relative;
+}
+.pixel-card::after{
+  content:'';position:absolute;
+  right:-6px;bottom:-6px;
+  width:100%;height:100%;
+  border:2px solid var(--gold);
+  z-index:-1;
+}
+.pixel-card h3{
+  font-family:var(--pixel);font-size:0.65rem;
+  color:var(--gold);margin-bottom:1rem;line-height:1.8;
+}
+.pixel-card p{
+  font-family:var(--vt);font-size:1.2rem;
+  color:rgba(238,238,245,0.75);line-height:1.7;
+}
+.stat-row{
+  display:flex;gap:0;flex-wrap:wrap;
+  border:2px solid var(--border);margin-bottom:2rem;
+}
+.stat-item{
+  flex:1;min-width:120px;
+  padding:1.5rem;text-align:center;
+  border-right:2px solid var(--border);
+}
+.stat-item:last-child{border-right:none;}
+.stat-num{
+  font-family:var(--pixel);font-size:1.2rem;
+  color:var(--gold);display:block;margin-bottom:0.4rem;
+}
+.stat-lbl{
+  font-family:var(--pixel);font-size:0.38rem;
+  color:var(--muted);letter-spacing:1px;
+}
+.tech-list{
+  display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;
+}
+.tech-chip{
+  font-family:var(--pixel);font-size:0.38rem;
+  padding:0.4rem 0.7rem;
+  border:2px solid var(--purple);
+  color:var(--purple);letter-spacing:1px;
+}
+
+/* ═══════════════════════════════════════
+   CONTACT PAGE
+═══════════════════════════════════════ */
+.contact-hero{
+  background:linear-gradient(180deg,var(--bg2),var(--bg));
+  padding:5rem 2rem 4rem;text-align:center;
+}
+.contact-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:3rem;max-width:1000px;margin:0 auto;
+  padding:0 2rem 5rem;
+}
+@media(max-width:700px){.contact-layout{grid-template-columns:1fr;}}
+
+.contact-info h3{
+  font-family:var(--pixel);font-size:0.6rem;
+  color:var(--gold);margin-bottom:1.5rem;line-height:1.8;
+}
+.contact-item{
+  display:flex;align-items:flex-start;gap:1rem;
+  margin-bottom:1.5rem;padding-bottom:1.5rem;
+  border-bottom:1px solid var(--border);
+}
+.contact-item:last-child{border-bottom:none;}
+.contact-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px;}
+.contact-item h4{
+  font-family:var(--pixel);font-size:0.45rem;
+  color:var(--teal);margin-bottom:0.4rem;letter-spacing:1px;
+}
+.contact-item p{
+  font-family:var(--vt);font-size:1.1rem;
+  color:var(--muted);
+}
+.contact-item a{color:var(--gold);text-decoration:none;}
+.contact-item a:hover{text-decoration:underline;}
+
+/* Form */
+.contact-form{background:var(--card);border:2px solid var(--border);padding:2rem;}
+.contact-form h3{
+  font-family:var(--pixel);font-size:0.6rem;
+  color:var(--gold);margin-bottom:1.5rem;line-height:1.8;
+}
+.form-group{margin-bottom:1.2rem;}
+.form-group label{
+  font-family:var(--pixel);font-size:0.42rem;
+  color:var(--teal);display:block;margin-bottom:0.5rem;letter-spacing:1px;
+}
+.form-group input,
+.form-group textarea,
+.form-group select{
+  width:100%;font-family:var(--vt);font-size:1.1rem;
+  background:var(--bg);border:2px solid var(--border);
+  color:var(--white);padding:0.7rem 0.9rem;
+  outline:none;resize:none;
+  transition:border-color 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus{border-color:var(--gold);}
+.form-group textarea{height:120px;}
+.form-group select option{background:var(--bg);}
+.form-success{
+  display:none;
+  font-family:var(--pixel);font-size:0.5rem;
+  color:var(--teal);text-align:center;
+  padding:1rem;border:2px solid var(--teal);
+  margin-top:1rem;line-height:2;
+}
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+footer{
+  background:#050508;
+  border-top:2px solid var(--gold);
+  padding:2rem;text-align:center;
+  position:relative;z-index:2;
+}
+.footer-logo{
+  font-family:var(--pixel);font-size:0.6rem;
+  color:var(--gold);margin-bottom:0.8rem;display:block;
+}
+footer p{
+  font-family:var(--pixel);font-size:0.38rem;
+  color:var(--muted);letter-spacing:1px;line-height:2;
+}
+footer a{color:var(--teal);text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+
+/* ═══════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════ */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(12px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ═══════════════════════════════════════
+   MOBILE NAV
+═══════════════════════════════════════ */
+@media(max-width:768px){
+  .nav-links{
+    display:none;flex-direction:column;
+    position:fixed;top:64px;left:0;right:0;
+    background:rgba(10,10,15,0.98);
+    border-bottom:2px solid var(--gold);
+    padding:1rem;z-index:99;
+  }
+  .nav-links.open{display:flex;}
+  .nav-links li a{padding:0.8rem 0;font-size:0.45rem;}
+  .hamburger{display:flex;}
+  .nav-search{display:none;}
+  .hero-logo-text{font-size:1.2rem;}
+  .contact-layout{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <a class="nav-logo" onclick="showPage('home')">
+    🦅 HAWKS<br><span>& OWLS</span>
+  </a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" onclick="showPage('home')"    class="active" id="nav-home">HOME</a></li>
+    <li><a href="#" onclick="showPage('games')"            id="nav-games">GAMES</a></li>
+    <li><a href="#" onclick="showPage('about')"            id="nav-about">ABOUT</a></li>
+    <li><a href="#" onclick="showPage('contact')"          id="nav-contact">CONTACT</a></li>
+    <li><a href="https://sites.google.com/view/hawksandowls/home" target="_blank">PRIVACY</a></li>
+  </ul>
+
+  <div class="nav-search">
+    <input type="text" id="navSearch" placeholder="SEARCH GAMES..." onkeydown="if(event.key==='Enter')searchGames()"/>
+    <button onclick="searchGames()">▶ GO</button>
+  </div>
+
+  <div class="hamburger" onclick="toggleNav()" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HOME PAGE
+═══════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="stars" id="stars"></div>
+    <p class="hero-eyebrow">▶ INDIE GAME STUDIO</p>
+    <div class="pixel-mascot">🦉</div>
+    <h1 class="hero-logo-text">HAWKS<br><span>&</span><br>OWLS</h1>
+    <p class="hero-tagline">[ Crafting worlds, one pixel at a time ]</p>
+    <div class="hero-btns">
+      <a class="btn btn-gold" onclick="showPage('games')">▶ OUR GAMES</a>
+      <a class="btn btn-outline" onclick="showPage('contact')">✉ BETA ACCESS</a>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- LATEST NEWS / CONTENT -->
+  <section class="news-section">
+    <div class="section-header">
+      <span class="section-tag">// LATEST</span>
+      <h2 class="section-title">NEWS & <span>UPDATES</span></h2>
+    </div>
+    <div class="news-grid">
+
+      <div class="news-card reveal" onclick="window.open('https://youtube.com','_blank')">
+        <span class="news-type type-yt">▶ YOUTUBE</span>
+        <div class="news-thumb">🎮</div>
+        <h3>PUZZLE CLASH — GAMEPLAY REVEAL TRAILER</h3>
+        <p>Watch the first official gameplay footage of Puzzle Clash. Real-time battles, colorful puzzles, and head-to-head action.</p>
+        <span class="news-date">📅 MARCH 2026</span>
+      </div>
+
+      <div class="news-card reveal" onclick="window.open('https://reddit.com','_blank')">
+        <span class="news-type type-update">▲ REDDIT</span>
+        <div class="news-thumb">🧩</div>
+        <h3>PUZZLE CLASH CLOSED BETA — JOIN THE WAITLIST</h3>
+        <p>We're opening up 50 beta spots for Android players. Drop your email and get early access before anyone else.</p>
+        <span class="news-date">📅 MARCH 2026</span>
+      </div>
+
+      <div class="news-card reveal" onclick="window.open('https://medium.com','_blank')">
+        <span class="news-type type-dev">✍ MEDIUM</span>
+        <div class="news-thumb">📖</div>
+        <h3>DEV LOG #1 — BUILDING PUZZLE CLASH FROM SCRATCH</h3>
+        <p>How we built a real-time multiplayer puzzle game using Unity and Photon PUN 2. Lessons learned and what's next.</p>
+        <span class="news-date">📅 FEB 2026</span>
+      </div>
+
+      <div class="news-card reveal" onclick="window.open('https://youtube.com','_blank')">
+        <span class="news-type type-yt">▶ YOUTUBE</span>
+        <div class="news-thumb">⚔️</div>
+        <h3>THE TARNISHED TRAIL — ELDEN RING QUIZ SHOWCASE</h3>
+        <p>Think you know the Lands Between? Watch the first look at our Elden Ring fan quiz mini-game.</p>
+        <span class="news-date">📅 JAN 2026</span>
+      </div>
+
+      <div class="news-card reveal" onclick="window.open('https://medium.com','_blank')">
+        <span class="news-type type-dev">✍ MEDIUM</span>
+        <div class="news-thumb">🦉</div>
+        <h3>WHY WE STARTED HAWKS & OWLS STUDIO</h3>
+        <p>The story behind our indie studio, our love for games, and the mission to create fun experiences for everyone.</p>
+        <span class="news-date">📅 DEC 2025</span>
+      </div>
+
+      <div class="news-card reveal" onclick="window.open('https://reddit.com','_blank')">
+        <span class="news-type type-update">▲ REDDIT</span>
+        <div class="news-thumb">🏆</div>
+        <h3>THE TARNISHED TRAIL — NOW LIVE FOR ELDEN RING FANS</h3>
+        <p>Our Elden Ring quiz game is available now! Test your lore knowledge and compare scores with the community.</p>
+        <span class="news-date">📅 NOV 2025</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SOCIALS BAR -->
+  <section class="socials-bar">
+    <div class="section-header">
+      <span class="section-tag">// FOLLOW US</span>
+      <h2 class="section-title">STAY IN THE <span>LOOP</span></h2>
+    </div>
+    <div class="socials-row">
+      <a class="social-btn s-yt" href="https://youtube.com" target="_blank">▶ YOUTUBE</a>
+      <a class="social-btn s-med" href="https://medium.com" target="_blank">✍ MEDIUM</a>
+      <a class="social-btn s-red" href="https://reddit.com" target="_blank">▲ REDDIT</a>
+    </div>
+    <p style="font-family:var(--pixel);font-size:0.38rem;color:var(--muted);margin-top:1.5rem;letter-spacing:1px;">
+      💡 Replace placeholder URLs with your actual channel/profile links
+    </p>
+  </section>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     GAMES PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-games">
+
+  <div class="games-hero">
+    <span class="section-tag">// OUR CATALOG</span>
+    <h1 class="section-title" style="margin-bottom:0.5rem;">ALL <span>GAMES</span></h1>
+    <p style="font-family:var(--vt);font-size:1.3rem;color:var(--muted);margin-top:0.5rem;">2 games published • Android</p>
+    <div class="search-bar-big">
+      <input type="text" id="gameSearch" placeholder="SEARCH GAMES..." oninput="filterGames()"/>
+      <button onclick="filterGames()">▶ SEARCH</button>
+    </div>
+  </div>
+
+  <div style="max-width:900px;margin:0 auto;padding:0 2rem;">
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('all',this)">ALL GAMES</button>
+      <button class="filter-tab" onclick="setFilter('puzzle',this)">PUZZLE</button>
+      <button class="filter-tab" onclick="setFilter('trivia',this)">TRIVIA</button>
+      <button class="filter-tab" onclick="setFilter('beta',this)">IN BETA</button>
+      <button class="filter-tab" onclick="setFilter('live',this)">LIVE</button>
+    </div>
+  </div>
+
+  <div class="games-grid" id="gamesGrid">
+
+    <!-- PUZZLE CLASH -->
+    <div class="game-card" data-tags="puzzle beta multiplayer android">
+      <div class="game-cover game-cover-pc">
+        🧩
+        <span class="game-cover-label label-beta">BETA</span>
+      </div>
+      <div class="game-info">
+        <h2>PUZZLE CLASH</h2>
+        <span class="game-genre">// PUZZLE · MULTIPLAYER · PVP</span>
+        <p>Battle real players in fast-paced real-time puzzle duels. Match faster, think smarter, and climb the leaderboards. Built with Unity & Photon PUN 2.</p>
+        <div class="game-tags">
+          <span class="tag">ANDROID</span>
+          <span class="tag">MULTIPLAYER</span>
+          <span class="tag">UNITY</span>
+          <span class="tag">CLOSED BETA</span>
+        </div>
+        <div class="game-btns">
+          <a class="btn-sm btn-sm-gold" onclick="showPage('contact')">✉ JOIN BETA</a>
+          <a class="btn-sm btn-sm-outline" href="https://youtube.com" target="_blank">▶ TRAILER</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- THE TARNISHED TRAIL -->
+    <div class="game-card" data-tags="trivia quiz eldenring live android">
+      <div class="game-cover game-cover-tt">
+        ⚔️
+        <span class="game-cover-label label-live">LIVE</span>
+      </div>
+      <div class="game-info">
+        <h2>THE TARNISHED TRAIL</h2>
+        <span class="game-genre">// TRIVIA · ELDEN RING · FAN GAME</span>
+        <p>A love letter to Elden Ring fans. Test your knowledge of the Lands Between — lore, bosses, items, and secrets. How Tarnished are you?</p>
+        <div class="game-tags">
+          <span class="tag">ANDROID</span>
+          <span class="tag">ELDEN RING</span>
+          <span class="tag">QUIZ</span>
+          <span class="tag">FREE</span>
+        </div>
+        <div class="game-btns">
+          <a class="btn-sm btn-sm-gold" href="https://play.google.com" target="_blank">▶ PLAY NOW</a>
+          <a class="btn-sm btn-sm-outline" href="https://youtube.com" target="_blank">▶ TRAILER</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-results" id="noResults" style="display:none;">
+      <p>NO GAMES FOUND</p>
+      <p style="font-size:0.45rem;margin-top:1rem;">TRY A DIFFERENT SEARCH TERM</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ABOUT PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-about">
+
+  <div class="about-hero">
+    <span class="section-tag">// OUR STORY</span>
+    <h1 class="section-title">ABOUT <span>HAWKS & OWLS</span></h1>
+    <p style="font-family:var(--vt);font-size:1.3rem;color:var(--muted);margin-top:1rem;">Independent. Passionate. Pixel-obsessed.</p>
+  </div>
+
+  <div class="about-content">
+
+    <div class="stat-row reveal">
+      <div class="stat-item">
+        <span class="stat-num">2</span>
+        <span class="stat-lbl">GAMES</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">2026</span>
+        <span class="stat-lbl">FOUNDED</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">Android</span>
+        <span class="stat-lbl">PLATFORM</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">∞</span>
+        <span class="stat-lbl">PASSION</span>
+      </div>
+    </div>
+
+    <div class="pixel-card reveal">
+      <h3>🦉 WHO WE ARE</h3>
+      <p>Hawks & Owls is an indie game studio built on curiosity, creativity, and a deep love for games. We're a small team that believes great games don't need giant budgets — just great ideas and the drive to see them through.</p>
+      <br/>
+      <p>From real-time multiplayer puzzle battles to Elden Ring fan trivia, we build games that are fun to pick up and hard to put down. Everything runs on Android, and we're just getting started.</p>
+    </div>
+
+    <div class="pixel-card reveal">
+      <h3>🎮 WHAT WE BUILD</h3>
+      <p>Our games span puzzle, trivia, and multiplayer — always mobile-first, always free or fair to play. We use Unity as our core engine and build with tools the community loves.</p>
+      <div class="tech-list">
+        <span class="tech-chip">UNITY</span>
+        <span class="tech-chip">PHOTON PUN 2</span>
+        <span class="tech-chip">UNITY ADS</span>
+        <span class="tech-chip">ANDROID</span>
+        <span class="tech-chip">C#</span>
+        <span class="tech-chip">GOOGLE PLAY</span>
+      </div>
+    </div>
+
+    <div class="pixel-card reveal">
+      <h3>📜 OUR MISSION</h3>
+      <p>Build games that bring people together — whether that's competing in a puzzle clash or bonding over Elden Ring lore. We share our journey openly through dev logs, community posts, and gameplay videos so others can learn alongside us.</p>
+    </div>
+
+    <div class="pixel-card reveal">
+      <h3>⚖️ PRIVACY & LEGAL</h3>
+      <p>We take privacy seriously. Our games collect minimal data and are transparent about third-party services like Unity Ads and Photon. Read our full privacy policy on our official Google Site.</p>
+      <br/>
+      <a class="btn-sm btn-sm-outline" href="https://sites.google.com/view/hawksandowls/home" target="_blank" style="margin-top:0.5rem;">▶ READ PRIVACY POLICY</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CONTACT PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-contact">
+
+  <div class="contact-hero">
+    <span class="section-tag">// GET IN TOUCH</span>
+    <h1 class="section-title">CONTACT <span>US</span></h1>
+    <p style="font-family:var(--vt);font-size:1.3rem;color:var(--muted);margin-top:1rem;">Beta requests, feedback, collabs — we read everything.</p>
+  </div>
+
+  <div class="contact-layout">
+
+    <!-- Info side -->
+    <div class="contact-info reveal">
+      <h3>📡 REACH US</h3>
+
+      <div class="contact-item">
+        <span class="contact-icon">📧</span>
+        <div>
+          <h4>EMAIL</h4>
+          <p><a href="mailto:hawksnowls1@gmail.com">hawksnowls1@gmail.com</a></p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <span class="contact-icon">▶</span>
+        <div>
+          <h4>YOUTUBE</h4>
+          <p><a href="https://youtube.com" target="_blank">Hawks & Owls Channel</a></p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <span class="contact-icon">✍</span>
+        <div>
+          <h4>MEDIUM</h4>
+          <p><a href="https://medium.com" target="_blank">Dev Logs & Articles</a></p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <span class="contact-icon">▲</span>
+        <div>
+          <h4>REDDIT</h4>
+          <p><a href="https://reddit.com" target="_blank">Community & Updates</a></p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <span class="contact-icon">⚖️</span>
+        <div>
+          <h4>PRIVACY POLICY</h4>
+          <p><a href="https://sites.google.com/view/hawksandowls/home" target="_blank">View on Google Sites</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form side -->
+    <div class="contact-form reveal">
+      <h3>✉ SEND A MESSAGE</h3>
+
+      <div class="form-group">
+        <label>YOUR NAME</label>
+        <input type="text" id="cf-name" placeholder="Tarnished Hero"/>
+      </div>
+      <div class="form-group">
+        <label>EMAIL ADDRESS</label>
+        <input type="email" id="cf-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>SUBJECT</label>
+        <select id="cf-subject">
+          <option value="">— SELECT —</option>
+          <option>🎮 Beta Access Request — Puzzle Clash</option>
+          <option>⚔️ Feedback — The Tarnished Trail</option>
+          <option>🤝 Collaboration / Partnership</option>
+          <option>🐛 Bug Report</option>
+          <option>📣 Press / Media Inquiry</option>
+          <option>💬 General Message</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>MESSAGE</label>
+        <textarea id="cf-message" placeholder="Tell us what's on your mind..."></textarea>
+      </div>
+
+      <button class="btn btn-gold" style="width:100%;text-align:center;" onclick="submitForm()">
+        ▶ SEND MESSAGE
+      </button>
+
+      <div class="form-success" id="formSuccess">
+        ✅ MESSAGE RECEIVED!<br/>
+        WE'LL GET BACK TO YOU SOON.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer>
+  <span class="footer-logo">🦉 HAWKS & OWLS</span>
+  <p>© 2026 Hawks & Owls Studio. All Rights Reserved.</p>
+  <p style="margin-top:0.5rem;">
+    <a href="https://sites.google.com/view/hawksandowls/home" target="_blank">Privacy Policy</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:hawksnowls1@gmail.com">hawksnowls1@gmail.com</a>
+    &nbsp;·&nbsp;
+    <a href="https://youtube.com" target="_blank">YouTube</a>
+    &nbsp;·&nbsp;
+    <a href="https://medium.com" target="_blank">Medium</a>
+    &nbsp;·&nbsp;
+    <a href="https://reddit.com" target="_blank">Reddit</a>
+  </p>
+  <p style="margin-top:1rem;font-size:0.32rem;">MADE WITH ♥ AND TOO MUCH COFFEE</p>
+</footer>
+
+<script>
+/* ═══ PIXEL STARS ═══ */
+(function(){
+  const c=document.getElementById('stars');
+  if(!c)return;
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    s.style.cssText=`
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      animation-delay:${Math.random()*3}s;
+      animation-duration:${1.5+Math.random()*2}s;
+      opacity:${0.3+Math.random()*0.7};
+      width:${Math.random()>0.7?6:4}px;
+      height:${Math.random()>0.7?6:4}px;
+      background:${Math.random()>0.5?'#f5c542':Math.random()>0.5?'#00e5c8':'#fff'};
+    `;
+    c.appendChild(s);
+  }
+})();
+
+/* ═══ PAGE NAVIGATION ═══ */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);
+  if(pg){pg.classList.add('active');window.scrollTo(0,0);}
+  const nav=document.getElementById('nav-'+id);
+  if(nav)nav.classList.add('active');
+  // Close mobile nav
+  document.getElementById('navLinks').classList.remove('open');
+  // Trigger reveals
+  setTimeout(triggerReveals,100);
+  return false;
+}
+
+/* ═══ HAMBURGER ═══ */
+function toggleNav(){
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+/* ═══ NAV SEARCH ═══ */
+function searchGames(){
+  const q=document.getElementById('navSearch').value.trim();
+  document.getElementById('gameSearch').value=q;
+  showPage('games');
+  setTimeout(filterGames,150);
+}
+
+/* ═══ GAME FILTER / SEARCH ═══ */
+let activeFilter='all';
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  filterGames();
+}
+function filterGames(){
+  const q=(document.getElementById('gameSearch').value||'').toLowerCase();
+  const cards=document.querySelectorAll('.game-card');
+  let visible=0;
+  cards.forEach(card=>{
+    const tags=card.dataset.tags||'';
+    const text=card.innerText.toLowerCase();
+    const matchSearch=!q||text.includes(q)||tags.includes(q);
+    const matchFilter=activeFilter==='all'||tags.includes(activeFilter);
+    if(matchSearch&&matchFilter){
+      card.style.display='';visible++;
+    } else {
+      card.style.display='none';
+    }
+  });
+  document.getElementById('noResults').style.display=visible===0?'block':'none';
+}
+
+/* ═══ CONTACT FORM ═══ */
+function submitForm(){
+  const name=document.getElementById('cf-name').value.trim();
+  const email=document.getElementById('cf-email').value.trim();
+  const subject=document.getElementById('cf-subject').value;
+  const msg=document.getElementById('cf-message').value.trim();
+  if(!name||!email||!subject||!msg){
+    alert('Please fill in all fields before sending!');return;
+  }
+  if(!email.includes('@')){alert('Please enter a valid email address.');return;}
+  // Open mailto as fallback (replace with Google Forms action URL for real form)
+  const mailto=`mailto:hawksnowls1@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('From: '+name+' ('+email+')\n\n'+msg)}`;
+  window.location.href=mailto;
+  document.getElementById('formSuccess').style.display='block';
+  ['cf-name','cf-email','cf-message'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cf-subject').value='';
+}
+
+/* ═══ SCROLL REVEAL ═══ */
+function triggerReveals(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){
+        setTimeout(()=>e.target.classList.add('visible'),i*80);
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:0.1});
+  document.querySelectorAll('.page.active .reveal').forEach(el=>{
+    if(!el.classList.contains('visible'))obs.observe(el);
+  });
+}
+triggerReveals();
+
+/* ═══ PREVENT NAV HREF SCROLL ═══ */
+document.querySelectorAll('.nav-links a[onclick]').forEach(a=>{
+  a.addEventListener('click',e=>e.preventDefault());
+});
+</script>
+</body>
+</html>
