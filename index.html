@@ -11,17 +11,17 @@
 ═══════════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:       #0a0a0f;
-  --bg2:      #0f0f1a;
-  --card:     #13131f;
-  --border:   #2a2a3f;
-  --gold:     #f5c542;
-  --amber:    #e08c1a;
-  --teal:     #00e5c8;
-  --red:      #ff4455;
-  --purple:   #9b59ff;
-  --white:    #eeeef5;
-  --muted:    #6b6b8a;
+  --bg:       #07060a;
+  --bg2:      #0d0b12;
+  --card:     #14111a;
+  --border:   #2a2416;
+  --gold:     #f0c040;
+  --amber:    #8a5a14;
+  --teal:     #d99a2a;
+  --red:      #e85820;
+  --purple:   #4a2f10;
+  --white:    #f0e4c8;
+  --muted:    #8a7a5a;
   --pixel:    'Press Start 2P', monospace;
   --vt:       'VT323', monospace;
   --body:     'Nunito', sans-serif;
@@ -51,23 +51,26 @@ body::before{
   content:'';
   position:fixed;inset:0;
   background-image:
-    linear-gradient(rgba(245,197,66,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245,197,66,0.03) 1px, transparent 1px);
-  background-size:32px 32px;
+    linear-gradient(rgba(240,192,64,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240,192,64,0.04) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, rgba(240,192,64,0.18), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(138,90,20,0.22), transparent 55%);
+  background-size:32px 32px, 32px 32px, 100% 100%, 100% 100%;
   pointer-events:none;z-index:0;
 }
 
-/* scanline overlay */
+/* scanline + blood fog overlay */
 body::after{
   content:'';
   position:fixed;inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.08) 2px,
-    rgba(0,0,0,0.08) 4px
-  );
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.18) 2px,
+      rgba(0,0,0,0.18) 4px
+    );
   pointer-events:none;z-index:1;
 }
 
@@ -93,8 +96,18 @@ nav{
   line-height:1.6;
   text-decoration:none;
   cursor:pointer;
+  display:flex;align-items:center;gap:0.7rem;
 }
-.nav-logo span{color:var(--teal);}
+.nav-logo-img{
+  width:44px;height:44px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  object-fit:cover;
+  box-shadow:0 0 12px rgba(240,192,64,0.35);
+  image-rendering:auto;
+}
+.nav-logo-text{display:inline-block;}
+.nav-logo-text span{color:var(--teal);}
 
 .nav-links{
   display:flex;gap:0;
@@ -217,6 +230,55 @@ nav{
 @keyframes bounce{
   0%,100%{transform:translateY(0);}
   50%{transform:translateY(-8px);}
+}
+
+.hero-portrait{
+  width:clamp(140px,22vw,220px);
+  height:clamp(140px,22vw,220px);
+  margin:0 auto 1.8rem;
+  border-radius:50%;
+  overflow:hidden;
+  border:3px solid var(--gold);
+  box-shadow:
+    0 0 30px rgba(240,192,64,0.45),
+    0 0 60px rgba(240,192,64,0.2),
+    inset 0 0 30px rgba(0,0,0,0.6);
+  animation:fadeIn 0.7s ease both, portraitGlow 3.5s ease-in-out infinite;
+  position:relative;
+}
+.hero-portrait img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  image-rendering:auto;
+}
+@keyframes portraitGlow{
+  0%,100%{box-shadow:0 0 30px rgba(240,192,64,0.45),0 0 60px rgba(240,192,64,0.2),inset 0 0 30px rgba(0,0,0,0.6);}
+  50%    {box-shadow:0 0 45px rgba(240,192,64,0.65),0 0 90px rgba(240,192,64,0.3),inset 0 0 30px rgba(0,0,0,0.6);}
+}
+
+/* CINEMATIC BANNER */
+.cinema-banner{
+  position:relative;
+  width:100%;
+  max-width:1400px;
+  margin:0 auto;
+  overflow:hidden;
+  aspect-ratio: 2 / 1;
+  border-top:2px solid var(--gold);
+  border-bottom:2px solid var(--gold);
+  box-shadow:0 0 40px rgba(240,192,64,0.18);
+}
+.cinema-banner img{
+  width:100%;height:100%;display:block;
+  object-fit:cover;
+  object-position:center bottom;
+  image-rendering:auto;
+}
+.cinema-banner-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg, rgba(7,6,10,0.35) 0%, transparent 30%, transparent 70%, rgba(7,6,10,0.55) 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+  pointer-events:none;
 }
 
 .hero-btns{
@@ -363,6 +425,12 @@ section{padding:5rem 2rem;position:relative;z-index:2;}
 .s-med:hover {transform:translate(3px,3px);box-shadow:none;}
 .s-red {color:#ff6314;border-color:#ff6314;box-shadow:3px 3px 0 #c04000;}
 .s-red:hover {transform:translate(3px,3px);box-shadow:none;}
+.s-tt  {color:#e8dcc5;border-color:#e8dcc5;box-shadow:3px 3px 0 #6a4a5a;}
+.s-tt:hover  {transform:translate(3px,3px);box-shadow:none;}
+.s-tw  {color:#a06ad6;border-color:#a06ad6;box-shadow:3px 3px 0 #5a2a8a;}
+.s-tw:hover  {transform:translate(3px,3px);box-shadow:none;}
+.s-kk  {color:#5ad16a;border-color:#5ad16a;box-shadow:3px 3px 0 #1f6a2a;}
+.s-kk:hover  {transform:translate(3px,3px);box-shadow:none;}
 
 /* ═══════════════════════════════════════
    GAMES PAGE
@@ -548,6 +616,209 @@ section{padding:5rem 2rem;position:relative;z-index:2;}
 }
 
 /* ═══════════════════════════════════════
+   BLOG — LISTING & POST
+═══════════════════════════════════════ */
+.blog-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:1.8rem;
+  max-width:1100px;margin:0 auto;padding:0 2rem 5rem;
+}
+.blog-card{
+  background:var(--card);
+  border:2px solid var(--border);
+  padding:1.8rem 1.6rem;
+  position:relative;cursor:pointer;
+  transition:transform 0.15s;
+  text-decoration:none;color:inherit;display:block;
+}
+.blog-card::after{
+  content:'';position:absolute;
+  right:-5px;bottom:-5px;
+  width:100%;height:100%;
+  border:2px solid var(--gold);z-index:-1;
+  transition:right 0.15s,bottom 0.15s;
+}
+.blog-card:hover{transform:translate(-3px,-3px);}
+.blog-card:hover::after{right:-8px;bottom:-8px;}
+.blog-card-tag{
+  font-family:var(--pixel);font-size:0.38rem;
+  color:var(--gold);letter-spacing:2px;
+  display:block;margin-bottom:0.8rem;
+}
+.blog-card h3{
+  font-family:var(--pixel);font-size:0.7rem;
+  color:var(--white);margin-bottom:0.9rem;line-height:1.7;letter-spacing:1px;
+}
+.blog-card p{
+  font-family:var(--vt);font-size:1.15rem;
+  color:var(--white);opacity:0.75;line-height:1.5;margin-bottom:1rem;
+}
+.blog-card-meta{
+  font-family:var(--pixel);font-size:0.35rem;
+  color:var(--muted);letter-spacing:1.5px;
+}
+
+/* POST PAGE */
+.post-hero{
+  background:linear-gradient(180deg,var(--bg2),var(--bg));
+  padding:4rem 2rem 3rem;text-align:center;
+  border-bottom:1px solid var(--border);
+}
+.post-back{
+  font-family:var(--pixel);font-size:0.4rem;
+  background:transparent;border:2px solid var(--gold);
+  color:var(--gold);padding:0.5rem 0.8rem;
+  cursor:pointer;letter-spacing:1.5px;
+  margin-bottom:2rem;display:inline-block;text-decoration:none;
+  transition:background 0.15s,color 0.15s;
+}
+.post-back:hover{background:var(--gold);color:var(--bg);}
+.post-tag{
+  font-family:var(--pixel);font-size:0.45rem;
+  letter-spacing:3px;color:var(--gold);
+  margin-bottom:1.2rem;display:block;
+}
+.post-title{
+  font-family:var(--pixel);
+  font-size:clamp(0.9rem,2.2vw,1.6rem);
+  color:var(--white);line-height:1.7;letter-spacing:1px;
+  margin-bottom:1.4rem;
+}
+.post-title .accent{color:var(--gold);}
+.post-meta{
+  font-family:var(--pixel);font-size:0.4rem;
+  color:var(--muted);letter-spacing:2.5px;
+}
+.post-body{
+  max-width:740px;margin:0 auto;padding:3rem 1.8rem 6rem;
+  font-family:var(--body);font-size:1.1rem;line-height:1.85;
+  color:var(--white);
+}
+.post-body p{margin-bottom:1.3rem;color:rgba(240,228,200,0.85);}
+.post-body strong{color:var(--gold);font-weight:700;}
+.post-body h2{
+  font-family:var(--pixel);font-size:0.85rem;
+  color:var(--gold);letter-spacing:2px;line-height:1.8;
+  margin:3.5rem 0 1.3rem;
+  padding-bottom:0.8rem;
+  border-bottom:1px solid var(--amber);
+}
+.post-lead{
+  font-family:var(--body);font-size:1.3rem;font-weight:600;
+  line-height:1.6;color:var(--white);
+  padding:0.5rem 0 0.5rem 1.5rem;
+  border-left:3px solid var(--gold);
+  margin-bottom:2.5rem;
+}
+
+.stat-block{
+  background:var(--card);
+  border:1px solid var(--amber);border-left:4px solid var(--gold);
+  padding:1.8rem 2rem;margin:2.5rem 0;position:relative;
+}
+.stat-block::before{
+  content:'BUILD STATS';
+  position:absolute;top:-0.65rem;left:1.3rem;
+  background:var(--card);padding:0 0.6rem;
+  font-family:var(--pixel);font-size:0.4rem;
+  letter-spacing:2.5px;color:var(--gold);
+}
+.stat-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0.7rem 0;
+  border-bottom:1px solid rgba(240,192,64,0.1);
+  font-family:var(--pixel);letter-spacing:1.5px;
+}
+.stat-row:last-child{border-bottom:none;}
+.stat-label-s{color:var(--muted);font-size:0.5rem;}
+.stat-value-s{color:var(--gold);font-size:0.65rem;}
+
+.tip-box{
+  background:rgba(232,88,32,0.1);
+  border:1px solid rgba(232,88,32,0.35);
+  border-left:4px solid var(--red);
+  padding:1.2rem 1.5rem;margin:2rem 0;
+  font-size:1rem;color:#d9b8a0;
+}
+.tip-box strong{
+  color:#ff9966;font-family:var(--pixel);letter-spacing:1.5px;
+  font-size:0.5rem;display:block;margin-bottom:0.5rem;
+}
+
+.location-callout{
+  background:var(--bg2);
+  border:1px solid rgba(240,192,64,0.22);
+  padding:1.4rem 1.8rem;margin:2rem 0;font-size:1.05rem;
+}
+.location-callout .loc-label{
+  font-family:var(--pixel);letter-spacing:2px;
+  font-size:0.42rem;color:var(--amber);
+  margin-bottom:0.6rem;display:block;
+}
+
+.post-closing{
+  margin-top:4rem;padding-top:2.5rem;
+  border-top:1px solid var(--amber);
+  font-size:1.2rem;font-style:italic;
+  color:var(--muted);text-align:center;line-height:1.7;
+}
+.post-closing strong{
+  display:block;
+  font-family:var(--pixel);font-style:normal;
+  font-size:0.85rem;letter-spacing:2px;
+  color:var(--gold);margin-top:1.2rem;line-height:1.7;
+}
+
+/* ═══════════════════════════════════════
+   WALL OF THANKS
+═══════════════════════════════════════ */
+.thanks-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1.5rem;
+  max-width:1100px;margin:0 auto;padding:0 2rem 5rem;
+}
+.thanks-card{
+  background:var(--card);
+  border:2px solid var(--border);
+  padding:1.5rem 1.3rem;
+  position:relative;
+  transition:transform 0.15s;
+}
+.thanks-card::after{
+  content:'';position:absolute;
+  right:-5px;bottom:-5px;
+  width:100%;height:100%;
+  border:2px solid var(--gold);
+  z-index:-1;
+  transition:right 0.15s,bottom 0.15s;
+}
+.thanks-card:hover{transform:translate(-3px,-3px);}
+.thanks-card:hover::after{right:-8px;bottom:-8px;}
+.thanks-rune{
+  font-size:1.8rem;margin-bottom:0.6rem;display:block;
+}
+.thanks-card h3{
+  font-family:var(--pixel);font-size:0.55rem;
+  color:var(--gold);margin-bottom:0.7rem;line-height:1.8;letter-spacing:1px;
+}
+.thanks-card p{
+  font-family:var(--vt);font-size:1.1rem;
+  color:var(--white);opacity:0.82;line-height:1.5;margin-bottom:0.8rem;
+}
+.thanks-card a{
+  font-family:var(--pixel);font-size:0.38rem;
+  color:var(--teal);letter-spacing:1px;text-decoration:none;
+  border-bottom:1px dashed var(--teal);padding-bottom:2px;
+}
+.thanks-card a:hover{color:var(--gold);border-color:var(--gold);}
+.thanks-card.placeholder{
+  border-style:dashed;opacity:0.6;
+}
+.thanks-card.placeholder h3{color:var(--muted);}
+
+/* ═══════════════════════════════════════
    CONTACT PAGE
 ═══════════════════════════════════════ */
 .contact-hero{
@@ -662,6 +933,8 @@ footer a:hover{text-decoration:underline;}
   .nav-links li a{padding:0.8rem 0;font-size:0.45rem;}
   .hamburger{display:flex;}
   .nav-search{display:none;}
+  .nav-logo-text{display:none;}
+  .nav-logo-img{width:38px;height:38px;}
   .hero-logo-text{font-size:1.2rem;}
   .contact-layout{grid-template-columns:1fr;}
 }
@@ -672,13 +945,16 @@ footer a:hover{text-decoration:underline;}
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav>
   <a class="nav-logo" onclick="showPage('home')">
-    🦅 HAWKS<br><span>& OWLS</span>
+    <img src="assets/logo.jpg" alt="Hawks & Owls" class="nav-logo-img"/>
+    <span class="nav-logo-text">HAWKS<br><span>& OWLS</span></span>
   </a>
 
   <ul class="nav-links" id="navLinks">
     <li><a href="#" onclick="showPage('home')"    class="active" id="nav-home">HOME</a></li>
     <li><a href="#" onclick="showPage('games')"            id="nav-games">GAMES</a></li>
     <li><a href="#" onclick="showPage('about')"            id="nav-about">ABOUT</a></li>
+    <li><a href="#" onclick="showPage('blog')"             id="nav-blog">BLOG</a></li>
+    <li><a href="#" onclick="showPage('thanks')"           id="nav-thanks">THANKS</a></li>
     <li><a href="#" onclick="showPage('contact')"          id="nav-contact">CONTACT</a></li>
     <li><a href="https://sites.google.com/view/hawksandowls/home" target="_blank">PRIVACY</a></li>
   </ul>
@@ -702,14 +978,24 @@ footer a:hover{text-decoration:underline;}
   <div class="hero">
     <div class="stars" id="stars"></div>
     <p class="hero-eyebrow">▶ INDIE GAME STUDIO</p>
-    <div class="pixel-mascot">🦉</div>
+    <div class="hero-portrait">
+      <img src="assets/logo.jpg" alt="Hawks & Owls warrior crest"/>
+    </div>
     <h1 class="hero-logo-text">HAWKS<br><span>&</span><br>OWLS</h1>
     <p class="hero-tagline">[ Crafting worlds, one pixel at a time ]</p>
     <div class="hero-btns">
       <a class="btn btn-gold" onclick="showPage('games')">▶ OUR GAMES</a>
-      <a class="btn btn-outline" onclick="showPage('contact')">✉ BETA ACCESS</a>
+      <a class="social-btn s-tt" href="https://www.tiktok.com/@hawksnowls" target="_blank">♪ TIKTOK</a>
+      <a class="social-btn s-tw" href="https://www.twitch.tv/colossalring" target="_blank">◉ TWITCH</a>
+      <a class="social-btn s-kk" href="https://kick.com/colossalring" target="_blank">⚡ KICK</a>
     </div>
   </div>
+
+  <!-- CINEMATIC BANNER -->
+  <section class="cinema-banner reveal">
+    <img src="assets/banner.jpg" alt="Two Worlds. One Truth."/>
+    <div class="cinema-banner-overlay"></div>
+  </section>
 
   <hr class="divider"/>
 
@@ -720,6 +1006,28 @@ footer a:hover{text-decoration:underline;}
       <h2 class="section-title">NEWS & <span>UPDATES</span></h2>
     </div>
     <div class="news-grid">
+
+      <div class="news-card reveal" onclick="window.open('https://www.youtube.com/watch?v=sBQiMjfqsps','_blank')">
+        <span class="news-type type-yt">▶ YOUTUBE</span>
+        <div class="news-thumb">
+          <img src="https://img.youtube.com/vi/sBQiMjfqsps/maxresdefault.jpg"
+            style="width:100%;height:100%;object-fit:cover;"/>
+        </div>
+        <h3>THE FORGOTTEN TRAGEDY THAT DESTROYED THE LANDS BETWEEN</h3>
+        <p>Uncover the lost catastrophe buried deep in Elden Ring's history — the tragedy that reshaped the Lands Between forever.</p>
+        <span class="news-date">📅 2026</span>
+      </div>
+
+      <div class="news-card reveal" onclick="window.open('https://www.youtube.com/watch?v=42dxTaLSXsI','_blank')">
+        <span class="news-type type-yt">▶ YOUTUBE</span>
+        <div class="news-thumb">
+          <img src="https://img.youtube.com/vi/42dxTaLSXsI/maxresdefault.jpg"
+            style="width:100%;height:100%;object-fit:cover;"/>
+        </div>
+        <h3>ELDEN RING HID THIS SCENE FOR 4 YEARS</h3>
+        <p>A hidden scene players missed for four years — what it reveals about Elden Ring's deepest secrets.</p>
+        <span class="news-date">📅 2026</span>
+      </div>
 
       <div class="news-card reveal" onclick="window.open('https://www.youtube.com/watch?v=Tjq9Bk4zb3Q','_blank')">
         <span class="news-type type-yt">▶ YOUTUBE</span>
@@ -865,6 +1173,9 @@ footer a:hover{text-decoration:underline;}
       <a class="social-btn s-yt" href="https://www.youtube.com/@HawksandOwls" target="_blank">▶ YOUTUBE</a>
       <a class="social-btn s-med" href="https://medium.com/@HawksandOwls" target="_blank">✍ MEDIUM</a>
       <a class="social-btn s-red" href="https://www.reddit.com/user/GamingLimsha/" target="_blank">▲ REDDIT</a>
+      <a class="social-btn s-tt" href="https://www.tiktok.com/@hawksnowls" target="_blank">♪ TIKTOK</a>
+      <a class="social-btn s-tw" href="https://www.twitch.tv/colossalring" target="_blank">◉ TWITCH</a>
+      <a class="social-btn s-kk" href="https://kick.com/colossalring" target="_blank">⚡ KICK</a>
     </div>
     <p style="font-family:var(--pixel);font-size:0.38rem;color:var(--muted);margin-top:1.5rem;letter-spacing:1px;">
       💡 Replace placeholder URLs with your actual channel/profile links
@@ -901,10 +1212,10 @@ footer a:hover{text-decoration:underline;}
   <div class="games-grid" id="gamesGrid">
 
     <!-- PUZZLE CLASH -->
-    <div class="game-card" data-tags="puzzle beta multiplayer android">
+    <div class="game-card" data-tags="puzzle live multiplayer android">
       <div class="game-cover game-cover-pc">
         🧩
-        <span class="game-cover-label label-beta">BETA</span>
+        <span class="game-cover-label label-live">LIVE</span>
       </div>
       <div class="game-info">
         <h2>PUZZLE CLASH</h2>
@@ -914,7 +1225,7 @@ footer a:hover{text-decoration:underline;}
           <span class="tag">ANDROID</span>
           <span class="tag">MULTIPLAYER</span>
           <span class="tag">UNITY</span>
-          <span class="tag">CLOSED BETA</span>
+          <span class="tag">LIVE</span>
         </div>
         <div class="game-btns">
           <a class="btn-sm btn-sm-gold" href="https://play.google.com/store/apps/details?id=com.hawksandowls.puzzleclash" target="_blank">▶ PLAY NOW</a>
@@ -1012,6 +1323,279 @@ footer a:hover{text-decoration:underline;}
     </div>
 
   </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     BLOG LISTING PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-blog">
+
+  <div class="about-hero">
+    <span class="section-tag">// THE JOURNAL</span>
+    <h1 class="section-title">DEV <span>LOG</span> & GUIDES</h1>
+    <p style="font-family:var(--vt);font-size:1.3rem;color:var(--muted);margin-top:1rem;max-width:640px;margin-left:auto;margin-right:auto;">
+      Build guides, lore dives, and honest dev logs from the workshop.
+    </p>
+  </div>
+
+  <!--
+    ═══ HOW TO ADD A NEW POST ═══
+    1. Copy one of the <a class="blog-card"> blocks below, change onclick target to a new page id.
+    2. Copy one of the <div class="page" id="page-blog-..."> blocks below and fill in content.
+    3. The showPage() function handles routing automatically — no JS changes needed.
+  -->
+
+  <div class="blog-grid">
+
+    <a class="blog-card reveal" onclick="showPage('blog-duskbloods');return false;">
+      <span class="blog-card-tag">🩸 FROMSOFTWARE · DEEP DIVE</span>
+      <h3>WHAT WE KNOW ABOUT THE DUSKBLOODS</h3>
+      <p>On April 2nd 2025, FromSoftware announced a multiplayer game for a Nintendo console. Then they went silent. Every confirmed fact about their most mysterious project yet.</p>
+      <span class="blog-card-meta">📅 2026 · 6 MIN READ</span>
+    </a>
+
+    <a class="blog-card reveal" onclick="showPage('blog-strength');return false;">
+      <span class="blog-card-tag">⚔ ELDEN RING · BUILD GUIDE</span>
+      <h3>EVERYONE SAID STRENGTH WAS DEAD. THEY WERE WRONG.</h3>
+      <p>After the patch cycle, everyone moved to Bleed. Everyone moved to Faith. Nobody picked up the Greatsword. They were wrong.</p>
+      <span class="blog-card-meta">📅 2026 · 8 MIN READ</span>
+    </a>
+
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     BLOG POST — STRENGTH BUILD
+═══════════════════════════════════════ -->
+<div class="page" id="page-blog-strength">
+
+  <div class="post-hero">
+    <a class="post-back" onclick="showPage('blog');return false;">◀ BACK TO BLOG</a>
+    <span class="post-tag">⚔ ELDEN RING · BUILD GUIDE</span>
+    <h1 class="post-title">EVERYONE SAID <span class="accent">STRENGTH</span> WAS DEAD.<br/>THEY WERE WRONG.</h1>
+    <div class="post-meta">EARLY GAME · BEGINNER FRIENDLY · GREATSWORD BUILD</div>
+  </div>
+
+  <article class="post-body">
+
+    <p class="post-lead">After the patch cycle, everyone moved to Bleed. Everyone moved to Faith. Everyone moved to Arcane. Nobody picked up the Greatsword. They were wrong.</p>
+
+    <p>Bleed became so dominant that the entire community shifted overnight. Builds that could stagger bosses in seconds made everything else look slow. Unnecessary. But Bleed has a problem — it requires specific weapons, specific farming, and often thirty to forty hours of progression before the build even works properly.</p>
+
+    <p>Strength asks for none of that. Strength asks for one thing: hit something so hard that it cannot hit you back.</p>
+
+    <p>This build works before your first major boss. Before Margit. Before Godrick. And the weapon costs you two minutes of walking.</p>
+
+    <h2>THE WEAPON</h2>
+
+    <p>The weapon is called the <strong>Lordsworn's Greatsword</strong>. It's a Greatsword — a two-handed weapon with serious base damage and room to grow with every Strength point you invest. And it's completely free.</p>
+
+    <div class="location-callout">
+      <span class="loc-label">📍 LOCATION</span>
+      Head to <strong>Gatefront Ruins in Limgrave</strong> — one of the first areas you'll explore after the game opens up. Rest at the Gatefront Ruins Site of Grace. Look toward the camp behind you. There is a carriage. Walk to the back of it. Open the chest. That is your weapon.
+    </div>
+
+    <p>While you're still at Gatefront Ruins — don't leave yet. There is a small underground room nearby. Look for a staircase leading down into a lit cellar close to the ruins. Inside is a chest containing the <strong>Whetstone Knife</strong>. Pick it up. This item lets you change your weapon's affinity at any Site of Grace.</p>
+
+    <p>The affinity you want is <strong>Heavy</strong>. Heavy affinity raises your Strength scaling, meaning every point you put into Strength does more damage. Go to any Site of Grace, open Ashes of War, select your Greatsword, apply Heavy. Do this before anything else.</p>
+
+    <h2>THE STATS</h2>
+
+    <p>Most guides overcomplicate this. Before you reach Margit, you want three numbers — and only three.</p>
+
+    <div class="stat-block">
+      <div class="stat-row">
+        <span class="stat-label-s">STRENGTH</span>
+        <span class="stat-value-s">25</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label-s">VIGOR</span>
+        <span class="stat-value-s">18</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label-s">ENDURANCE</span>
+        <span class="stat-value-s">15</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label-s">TARGET LEVEL</span>
+        <span class="stat-value-s">22 – 25</span>
+      </div>
+    </div>
+
+    <p>Strength is your damage. Vigor is your health — do not skip it. Most players die to Margit over and over because they're walking around with eight hundred HP. Eighteen Vigor nearly doubles that. Endurance is your stamina — fifteen is enough to land a full combo without stopping mid-swing.</p>
+
+    <div class="tip-box">
+      <strong>⚠ TWO-HANDING</strong>
+      Hold Triangle (PlayStation) or Y (Xbox) to two-hand your Greatsword. The game multiplies your effective Strength by 1.5 — meaning 25 Strength becomes 37. More damage with no extra levels required. Get in that habit now.
+    </div>
+
+    <h2>THE ASH OF WAR</h2>
+
+    <p>Your Lordsworn's Greatsword already comes with an Ash of War called <strong>Stamp (Upward Cut)</strong>. You slam the weapon down, then cut back up. Two hits. Good damage, good poise damage against enemies that try to trade with you. Use that before Margit — you don't need to find anything else yet.</p>
+
+    <p>If you want an early upgrade, <strong>Knight Bernahl</strong> at Warmaster's Shack in Stormhill sells an Ash of War called <strong>War Cry</strong>. It's cheap and it works. Activate it before a fight and it buffs your heavy attacks for a short window. Worth grabbing when you pass through Stormhill on your way to Stormveil.</p>
+
+    <div class="tip-box">
+      <strong>🔒 ABOUT LION'S CLAW</strong>
+      You'll see Lion's Claw recommended everywhere for Strength builds. It drops from a Lion Guardian at Fort Gael in Caelid. That's a mid-game area — significantly more dangerous than Limgrave. Don't go there before Margit. The drop is guaranteed when you kill the guardian, so there's no farming required. Get it when you're actually ready for Caelid.
+    </div>
+
+    <h2>TALISMANS</h2>
+
+    <p><strong>Green Turtle Talisman</strong> — Found in Summonwater Village, northeast of where you start. Look for an underground room on the outskirts of the village near a group of turtles. You'll need one Stonesword Key to open the door. Inside is a chest. This talisman raises your stamina recovery speed, meaning more attacks, more consistently. Equip it the moment you find it.</p>
+
+    <p><strong>Erdtree's Favor</strong> — Inside Fringefolk Hero's Grave, reached through an imp statue at the Stranded Graveyard right at the start of the game. You'll need two Stonesword Keys to enter. If you chose a Stonesword Key as your starting gift, you have one — you'll need to find or purchase a second. The reward raises your maximum HP, stamina, and equip load all at once. For a build carrying a heavy sword and heavy armor, the equip load boost alone makes it worth the effort.</p>
+
+    <h2>ARMOR</h2>
+
+    <p>You're looking for two things: physical defense and poise. Poise is your ability to keep swinging without being interrupted mid-attack. Getting staggered halfway through a swing wastes the hit and leaves you exposed.</p>
+
+    <p>The rule is simple: stay below <strong>seventy percent of your equip load</strong>. Above that and you go into a heavy roll — slow, wide, easy to punish. Below seventy percent is a medium roll. Fast enough to dodge, heavy enough to absorb hits.</p>
+
+    <p>As you move through Stormveil Castle, enemy knights drop armor with high poise and strong physical defense. Pick those up and mix and match to stay under your equip load limit.</p>
+
+    <h2>MID-GAME UPGRADES</h2>
+
+    <p><strong>Weapon</strong> — Keep upgrading the Lordsworn's Greatsword with Smithing Stones as you find them. When you reach Caelid, hunt down a weapon simply called the <strong>Greatsword</strong>. It sits in a chest inside a carriage in northern Caelid — the same type of carriage you found your first weapon in. This is a Colossal Sword — a heavier class with slower swings but dramatically more damage and poise damage per hit. Think of it as graduating from your starter blade.</p>
+
+    <p><strong>Ash of War</strong> — Once you're ready for Caelid, go get Lion's Claw from Fort Gael. The skill launches you forward in a full somersault and slams the weapon down, staggering most bosses with consistent use. It becomes the engine of every fight.</p>
+
+    <p><strong>Talismans</strong> — Find the <strong>Starscourge Heirloom</strong> in Caelid — it raises your Strength by five points with no extra levels. Later, completing Iron Fist Alexander's questline rewards you with the <strong>Shard of Alexander</strong>, which boosts your Ash of War damage by fifteen percent. Stack those two with your early talismans and the setup is complete.</p>
+
+    <p><strong>Buff</strong> — At Fort Gael, lying on a corpse between two Flame Chariots, is an incantation called <strong>Flame, Grant Me Strength</strong>. It raises physical and fire attack power by twenty percent for thirty seconds. It requires fifteen Faith to cast — invest those points when you pick it up and don't touch Faith again. Use it at every fog gate before a major boss. Easiest free damage in the game.</p>
+
+    <div class="post-closing">
+      This build doesn't ask you to understand the meta. It doesn't ask you to farm for hours or watch forty videos before you can fight a single boss.<br/><br/>
+      It asks you to walk to a carriage. Pick up a sword. And hit something hard enough that it cannot get back up.
+      <strong>STRENGTH WAS NEVER WEAK. IT WAS JUST WAITING.</strong>
+    </div>
+
+  </article>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     BLOG POST — THE DUSKBLOODS
+═══════════════════════════════════════ -->
+<div class="page" id="page-blog-duskbloods">
+
+  <div class="post-hero">
+    <a class="post-back" onclick="showPage('blog');return false;">◀ BACK TO BLOG</a>
+    <span class="post-tag">🩸 FROMSOFTWARE · DEEP DIVE</span>
+    <h1 class="post-title">THE <span class="accent">DUSKBLOODS</span> — FROMSOFTWARE'S MOST MYSTERIOUS PROJECT</h1>
+    <div class="post-meta">GOTHIC MULTIPLAYER · NINTENDO SWITCH 2 · 2026 RELEASE</div>
+  </div>
+
+  <article class="post-body">
+
+    <p class="post-lead">On the second of April, 2025, during a Nintendo Direct, something strange happened. FromSoftware, the studio that built its reputation on punishing solitude — on worlds you wander alone through fog and rain — announced a multiplayer game. They announced it for a Nintendo console. And they gave it a name that sounded less like a product and more like a prophecy. The Duskbloods.</p>
+
+    <p>Nearly a year has passed since that reveal. In that time, the studio has gone quiet. No new trailers. No gameplay deep dives. No interviews beyond a handful of carefully chosen words from the director himself. For a company that once let Elden Ring breathe in the shadows for years before unveiling it, silence is not unusual. But this silence feels different. It feels deliberate.</p>
+
+    <p>What follows is every confirmed fact, every scrap of lore, and every unanswered question about the most mysterious FromSoftware project in years.</p>
+
+    <h2>THE ESSENTIALS</h2>
+
+    <p>The Duskbloods is an action role-playing game directed by <strong>Hidetaka Miyazaki</strong>, the creative force behind Dark Souls, Bloodborne, Sekiro, and Elden Ring. It is being developed exclusively for the <strong>Nintendo Switch 2</strong>. This is the first time FromSoftware has committed to a Nintendo home console exclusive since Lost Kingdoms II in 2003 — a gap of more than two decades. It is not a port. It is not a spinoff. It is a new intellectual property, built from the ground up for hardware that did not exist when the project began.</p>
+
+    <p>According to Miyazaki himself, development started as a loose collection of ideas shared with Nintendo in an early meeting. Nintendo saw potential. They offered the new Switch 2 hardware as a canvas. FromSoftware accepted, and the game's scope expanded to take advantage of the console's online capabilities.</p>
+
+    <p>The result is a player-versus-player, player-versus-environment hybrid that supports up to <strong>eight participants per match</strong>. You will not create your character. Instead, you choose from over a dozen pre-made warriors, each with their own weapons, abilities, and signature style. They are called the <strong>Bloodsworn</strong>. Collectively, they are the Duskbloods.</p>
+
+    <h2>THE LORE</h2>
+
+    <p>In the world Miyazaki has crafted, humanity is ending. Not through war. Not through plague. Through something older and stranger. As civilization reaches its final hour, a primal source called the <strong>First Blood</strong> begins to flow. With it arrives an event the game refers to as the <strong>Twilight of Humanity</strong>. Time fractures. Space collapses. Locations from across centuries and continents converge into a single contested arena, pulled together by forces no one fully understands.</p>
+
+    <p>Into this rupture, the Bloodsworn are summoned.</p>
+
+    <p>They are not vampires in the classical sense. Miyazaki has been explicit about this. The Bloodsworn are not monsters lurking in crypts or hissing at sunlight. They are something more romantic, more tragic. Beings who have transcended the limits of humanity through blood, drawing on a lineage of gothic fiction that stretches back through Bram Stoker, through Anne Rice, through the fevered imagination of the late nineteenth century. Their world is painted in the colors of that tradition. Wet cobblestones. Gaslight. Cathedrals with windows like wounds.</p>
+
+    <h2>THE BLOODBORNE CONNECTION</h2>
+
+    <p>If you are thinking of Bloodborne, you are not alone. The visual DNA of Yharnam runs through every frame of the reveal trailer. The same obsession with Victorian decay. The same reverence for cursed elegance. The same belief that beauty and horror are not opposites, but twins.</p>
+
+    <p>And yet The Duskbloods is not simply Bloodborne reborn. The trailer revealed something more ambitious. Victorian architecture stands alongside trains lit with electric neon. A character rockets across the sky using some kind of mechanical propulsion, suggesting influences from steampunk and early industrial fantasy. Snowfields open into catacombs. Rivers cut through ruined citadels. Above one battlefield, a colossal stone face watches the combatants below, suspended in the sky like a forgotten god.</p>
+
+    <p>Miyazaki later confirmed that this stone face is not decoration. It is an event. A match variable. One of many dynamic occurrences that can reshape a battle while it unfolds. Special enemies may spawn. New objectives may appear. Bonus rewards may tempt players away from their original plans. <strong>No two matches will unfold the same way.</strong></p>
+
+    <h2>HOW IT PLAYS</h2>
+
+    <p>Victory is measured in <strong>Victory Points</strong>. You can earn them through direct combat. You can also earn them through stealth, through completing objectives, through what Miyazaki described as opportunistic behavior. The design philosophy is freedom. You decide how to win. Each Bloodsworn can also summon a spectral ally to fight beside them, adding a layer of tactical depth that is rare in the genre.</p>
+
+    <p>Miyazaki has used one phrase repeatedly to describe the game's narrative style: <strong>fragmentary storytelling</strong>. For FromSoftware veterans, this is familiar territory. No sweeping cutscenes. No exposition dumps. The story will live in item descriptions, in environmental detail, in the shape of a crumbling altar and the whisper of a dying enemy. Players will be asked to piece the truth together themselves. This is the method that built the lore communities around Dark Souls and Elden Ring, and it is being applied now to a multiplayer framework for the first time in the studio's history.</p>
+
+    <h2>THE SILENCE AND THE DELAYS</h2>
+
+    <p>Since the April 2025 reveal, FromSoftware has said almost nothing about The Duskbloods. No gameplay demonstration. No combat breakdown. No character showcases. An entire calendar year has passed, and the game remains almost entirely a mystery. In February of 2026, a financial report from publisher KADOKAWA briefly confirmed that both The Duskbloods and the long-delayed Elden Ring Tarnished Edition are still scheduled for a 2026 release. That single sentence, buried in a quarterly earnings document, is the most recent official word on the project.</p>
+
+    <p>There are theories about why.</p>
+
+    <div class="tip-box">
+      <strong>THEORY 1 · PRACTICAL</strong>
+      FromSoftware is managing multiple projects simultaneously. Elden Ring Nightreign launched in May of 2025. Elden Ring Tarnished Edition for the Switch 2 was delayed out of 2025 due to severe performance issues, with reports of framerate drops and poor resolution during its Gamescom demo. The studio may be focusing its messaging on one project at a time, unwilling to dilute attention or cannibalize interest across releases.
+    </div>
+
+    <div class="tip-box">
+      <strong>THEORY 2 · TECHNICAL</strong>
+      The same Switch 2 hardware that troubled the Elden Ring port may be causing difficulties for The Duskbloods as well. An eight-player online action game running on handheld-capable hardware is a significant engineering challenge, and FromSoftware's history with technical optimization has been, at times, uneven. It is possible the studio is quietly rebuilding systems. It is possible the reveal came earlier than it should have.
+    </div>
+
+    <div class="tip-box">
+      <strong>THEORY 3 · THE MIYAZAKI WAY</strong>
+      FromSoftware may simply be doing what FromSoftware has always done. Waiting until the game is ready. Waiting until a single trailer can say everything. Miyazaki has a long history of preferring silence to hype cycles, and the absence of news may simply be the absence of noise, not the absence of progress.
+    </div>
+
+    <h2>WHAT WE STILL DON'T KNOW</h2>
+
+    <p>We do not know the release date. We do not know how the multiplayer will balance against the studio's famously uncompromising combat. We do not know whether The Duskbloods will remain a Nintendo Switch 2 exclusive forever, or whether — like Bloodborne on PlayStation — it will become one of those games that defines a console and refuses to leave it. We do not know the full roster of Bloodsworn. We do not know who the bosses are. We do not know what the First Blood truly is, or what happens to the one who finally claims it.</p>
+
+    <p>What we do know is this. Hidetaka Miyazaki is directing a gothic multiplayer action role-playing game, set during the final hours of humanity, in a world where time itself has broken open. The Bloodsworn will gather. They will fight. And when the Twilight of Humanity comes to its close, only one will taste the First Blood.</p>
+
+    <div class="post-closing">
+      The moontears, as Nintendo's own tagline puts it, will flow for one and one alone.<br/><br/>
+      When The Duskbloods finally emerges from the silence, we will see who is left standing to claim them.
+      <strong>ONE AND ONE ALONE.</strong>
+    </div>
+
+  </article>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     WALL OF THANKS PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-thanks">
+
+  <div class="about-hero">
+    <span class="section-tag">// WALL OF THANKS</span>
+    <h1 class="section-title">A HEROIC <span>TRIBUTE</span></h1>
+    <p style="font-family:var(--vt);font-size:1.3rem;color:var(--muted);margin-top:1rem;max-width:640px;margin-left:auto;margin-right:auto;">
+      To those who walked beside the Tarnished — every name etched here has lent their time, craft, or kindness to our journey. No builder stands alone.
+    </p>
+  </div>
+
+  <!--
+    ═══ HOW TO ADD A NEW ENTRY ═══
+    Copy one of the .thanks-card blocks below and fill in:
+      • thanks-rune  → a single emoji or symbol (🗡 ⚔ 🛡 🦉 ✍ 🎨 🔧 💀 🕯)
+      • <h3>         → their name (all caps, short)
+      • <p>          → what they did / why you're thanking them
+      • <a>          → optional link (portfolio, profile, etc.). Remove if none.
+    Remove the .placeholder card once you have at least a few real entries.
+  -->
+
+  <div class="thanks-grid">
+
+    <div class="thanks-card placeholder reveal">
+      <span class="thanks-rune">🕯</span>
+      <h3>YOU COULD BE HERE</h3>
+      <p>Helped out with code, art, testing, lore, or a kind word? Reach out on the contact page and your name will be etched into this wall.</p>
+      <a href="#" onclick="showPage('contact');return false;">→ GET IN TOUCH</a>
+    </div>
+
+  </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════
